@@ -7,6 +7,7 @@
 //
 
 #import "MyScene.h"
+#import "GameOverScene.h"
 
 @implementation MyScene
 
@@ -30,7 +31,8 @@
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     /* Called when a touch begins */
-
+    SKScene *_gameOverScene = [[GameOverScene alloc] initWithSize:self.size];
+    [self.view presentScene:_gameOverScene];
 }
 
 -(void)update:(CFTimeInterval)currentTime {

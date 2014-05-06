@@ -25,6 +25,7 @@
 		3F482C3819195FAD000AE47A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3F482C3619195FAD000AE47A /* InfoPlist.strings */; };
 		3F482C3A19195FAD000AE47A /* Project2Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F482C3919195FAD000AE47A /* Project2Tests.m */; };
 		3F482C451919601F000AE47A /* MenuView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F482C441919601F000AE47A /* MenuView.m */; };
+		3F482C4819196655000AE47A /* GameOverScene.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F482C4719196655000AE47A /* GameOverScene.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +64,8 @@
 		3F482C3919195FAD000AE47A /* Project2Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Project2Tests.m; sourceTree = "<group>"; };
 		3F482C431919601F000AE47A /* MenuView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MenuView.h; path = ../MenuView.h; sourceTree = "<group>"; };
 		3F482C441919601F000AE47A /* MenuView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MenuView.m; path = ../MenuView.m; sourceTree = "<group>"; };
+		3F482C4619196655000AE47A /* GameOverScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameOverScene.h; sourceTree = "<group>"; };
+		3F482C4719196655000AE47A /* GameOverScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameOverScene.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +129,8 @@
 			children = (
 				3F482C431919601F000AE47A /* MenuView.h */,
 				3F482C441919601F000AE47A /* MenuView.m */,
+				3F482C4619196655000AE47A /* GameOverScene.h */,
+				3F482C4719196655000AE47A /* GameOverScene.m */,
 				3F482C1819195FAD000AE47A /* AppDelegate.h */,
 				3F482C1919195FAD000AE47A /* AppDelegate.m */,
 				3F482C1B19195FAD000AE47A /* Main.storyboard */,
@@ -271,6 +276,7 @@
 				3F482C2019195FAD000AE47A /* ViewController.m in Sources */,
 				3F482C1A19195FAD000AE47A /* AppDelegate.m in Sources */,
 				3F482C1619195FAD000AE47A /* main.m in Sources */,
+				3F482C4819196655000AE47A /* GameOverScene.m in Sources */,
 				3F482C451919601F000AE47A /* MenuView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -484,6 +490,7 @@
 				3F482C3F19195FAD000AE47A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		3F482C4019195FAD000AE47A /* Build configuration list for PBXNativeTarget "Project2Tests" */ = {
 			isa = XCConfigurationList;
@@ -492,6 +499,7 @@
 				3F482C4219195FAD000AE47A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
