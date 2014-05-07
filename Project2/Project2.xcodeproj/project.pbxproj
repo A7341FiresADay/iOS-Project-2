@@ -26,6 +26,7 @@
 		3F482C3A19195FAD000AE47A /* Project2Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F482C3919195FAD000AE47A /* Project2Tests.m */; };
 		3F482C451919601F000AE47A /* MenuView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F482C441919601F000AE47A /* MenuView.m */; };
 		3F482C4819196655000AE47A /* GameOverScene.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F482C4719196655000AE47A /* GameOverScene.m */; };
+		3FFE3E1E191ACF99002A47A3 /* background@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3FFE3E1D191ACF99002A47A3 /* background@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +67,7 @@
 		3F482C441919601F000AE47A /* MenuView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MenuView.m; path = ../MenuView.m; sourceTree = "<group>"; };
 		3F482C4619196655000AE47A /* GameOverScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameOverScene.h; sourceTree = "<group>"; };
 		3F482C4719196655000AE47A /* GameOverScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameOverScene.m; sourceTree = "<group>"; };
+		3FFE3E1D191ACF99002A47A3 /* background@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "background@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,9 +95,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3F3FF13F191ACE6600E97B43 /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				3F482C4619196655000AE47A /* GameOverScene.h */,
+				3F482C4719196655000AE47A /* GameOverScene.m */,
+				3F482C431919601F000AE47A /* MenuView.h */,
+				3F482C441919601F000AE47A /* MenuView.m */,
+			);
+			name = Scenes;
+			sourceTree = "<group>";
+		};
 		3F482BFB19195FAD000AE47A = {
 			isa = PBXGroup;
 			children = (
+				3FFE3E1D191ACF99002A47A3 /* background@2x.png */,
 				3F482C0F19195FAD000AE47A /* Project2 */,
 				3F482C3319195FAD000AE47A /* Project2Tests */,
 				3F482C0619195FAD000AE47A /* Frameworks */,
@@ -127,10 +141,7 @@
 		3F482C0F19195FAD000AE47A /* Project2 */ = {
 			isa = PBXGroup;
 			children = (
-				3F482C431919601F000AE47A /* MenuView.h */,
-				3F482C441919601F000AE47A /* MenuView.m */,
-				3F482C4619196655000AE47A /* GameOverScene.h */,
-				3F482C4719196655000AE47A /* GameOverScene.m */,
+				3F3FF13F191ACE6600E97B43 /* Scenes */,
 				3F482C1819195FAD000AE47A /* AppDelegate.h */,
 				3F482C1919195FAD000AE47A /* AppDelegate.m */,
 				3F482C1B19195FAD000AE47A /* Main.storyboard */,
@@ -253,6 +264,7 @@
 				3F482C1419195FAD000AE47A /* InfoPlist.strings in Resources */,
 				3F482C2719195FAD000AE47A /* Images.xcassets in Resources */,
 				3F482C2519195FAD000AE47A /* Spaceship.png in Resources */,
+				3FFE3E1E191ACF99002A47A3 /* background@2x.png in Resources */,
 				3F482C1D19195FAD000AE47A /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
