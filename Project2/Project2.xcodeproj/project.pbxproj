@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0772CE05191B050C00F9156D /* wall.png in Resources */ = {isa = PBXBuildFile; fileRef = 0772CE04191B050C00F9156D /* wall.png */; };
 		3F482C0819195FAD000AE47A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F482C0719195FAD000AE47A /* Foundation.framework */; };
 		3F482C0A19195FAD000AE47A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F482C0919195FAD000AE47A /* CoreGraphics.framework */; };
 		3F482C0C19195FAD000AE47A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F482C0B19195FAD000AE47A /* UIKit.framework */; };
@@ -40,6 +41,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0772CE04191B050C00F9156D /* wall.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wall.png; sourceTree = "<group>"; };
 		3F482C0419195FAD000AE47A /* Project2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Project2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F482C0719195FAD000AE47A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		3F482C0919195FAD000AE47A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -109,6 +111,7 @@
 		3F482BFB19195FAD000AE47A = {
 			isa = PBXGroup;
 			children = (
+				0772CE04191B050C00F9156D /* wall.png */,
 				3FFE3E1D191ACF99002A47A3 /* background@2x.png */,
 				3F482C0F19195FAD000AE47A /* Project2 */,
 				3F482C3319195FAD000AE47A /* Project2Tests */,
@@ -266,6 +269,7 @@
 				3F482C2519195FAD000AE47A /* Spaceship.png in Resources */,
 				3FFE3E1E191ACF99002A47A3 /* background@2x.png in Resources */,
 				3F482C1D19195FAD000AE47A /* Main.storyboard in Resources */,
+				0772CE05191B050C00F9156D /* wall.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
