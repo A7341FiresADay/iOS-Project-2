@@ -72,6 +72,10 @@ int numWalls = 0;
 
 -(id)initWithSize:(CGSize)size {    
     if (self = [super initWithSize:size]) {
+        
+        //i want to see all the nodes, not just rendered ones
+        [self.scene.view setValue:@(YES) forKey:@"_showsCulledNodesInNodeCount"];
+        
         //set background node
         _bglayer=[SKNode node];
         [self addChild:_bglayer];
@@ -127,23 +131,24 @@ int numWalls = 0;
     }
      _lastUpdateTime = currentTime;
     
-
+    //NSLog([NSString stringWithFormat:@"BGLAYER's position: %f", _bglayer.position.x]);
     //NSLog([NSString stringWithFormat:@"onScreenTiles: %d", onScreenTiles]);
     SKAction *removeFromParent = [SKAction removeFromParent];
     [_bglayer enumerateChildNodesWithName:@"wall" usingBlock:^(SKNode *node, BOOL *stop)
      {
-         //NSLog([NSString stringWithFormat:@"node.position.x: %f", node.position.x]);
+         NSLog([NSString stringWithFormat:@"node.position.x: %f", node.position.x]);
+         NSLog([NSString stringWithFormat:@"tileWidth - bglayer.position: %f", (tileWidth- _bglayer.position.x)]);
          //NSLog([NSString stringWithFormat:@"node: %@", node]);
 
-            if (node.position.x < tileWidth/2)
+            if (node.position.x < tileWidth - _bglayer.position.x)
             {
-                NSLog([NSString stringWithFormat:@"Removing node: %@, %d", node, tileWidth+1]);
+                NSLog([NSString stringWithFormat:@"Removing node: %@, %d", node, tileWidth/2]);
                 --onScreenTiles;
                 [node runAction:removeFromParent];
             }
      }];
-    NSLog([NSString stringWithFormat:@"%d",[self countWalls]]);
-    if (onScreenTiles < randNumberX-15 || onScreenTiles < 0)
+    
+    if (onScreenTiles < 10/*randNumberX-15*/ || onScreenTiles < 0)
         [self spawnWalls];
     [self moveBG];
 }
