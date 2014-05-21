@@ -135,12 +135,13 @@ int numWalls = 0;
     //NSLog([NSString stringWithFormat:@"BGLAYER's position: %f", _bglayer.position.x]);
     //NSLog([NSString stringWithFormat:@"onScreenTiles: %d", onScreenTiles]);
     SKAction *removeFromParent = [SKAction removeFromParent];
+    SKAction *moveToLeft = [SKAction moveByX:-4 y:0 duration:0.01];
     [_bglayer enumerateChildNodesWithName:@"wall" usingBlock:^(SKNode *node, BOOL *stop)
      {
          //NSLog([NSString stringWithFormat:@"node.position.x: %f", node.position.x]);
          //NSLog([NSString stringWithFormat:@"tileWidth - bglayer.position: %f", (tileWidth- _bglayer.position.x)]);
          //NSLog([NSString stringWithFormat:@"node: %@", node]);
-
+         [node runAction: [SKAction repeatActionForever:moveToLeft]];
             if (node.position.x < tileWidth - _bglayer.position.x)
             {
                 //NSLog([NSString stringWithFormat:@"Removing a tile"]);
@@ -190,7 +191,7 @@ int numWalls = 0;
         wall.xScale = 2;
         wall.yScale = 1;
         wall.position = CGPointMake((i * wall.size.width) + (wall.size.width * 6), 380);
-        [_bglayer addChild:wall];
+        [_tileLayer addChild:wall];
         ++onScreenTiles;
     }
     tileWidth = wall.size.width;
@@ -211,7 +212,7 @@ int numWalls = 0;
         wall.yScale = 1;
             //spawn close to the right side of the screen
         wall.position = CGPointMake((i * wall.size.width) + self.scene.size.width - 100, 380);
-        [_bglayer addChild:wall];
+        [_tileLayer addChild:wall];
         ++onScreenTiles;
     }
     tileWidth = wall.size.width;
@@ -223,7 +224,7 @@ int numWalls = 0;
 - (int) countWalls
 {
     numWalls = 0;
-    [_bglayer enumerateChildNodesWithName:@"wall" usingBlock:^(SKNode *node, BOOL *stop)
+    [_tileLayer enumerateChildNodesWithName:@"wall" usingBlock:^(SKNode *node, BOOL *stop)
      {
          numWalls++;
          if (node.position.x < tileWidth/2)
