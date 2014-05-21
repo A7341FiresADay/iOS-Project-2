@@ -74,6 +74,12 @@ int tileWidth, _tempNumTiles, onScreenTiles = 0;
 int numWalls = 0;
 int minNumTiles = 8;
 int maxNumTiles = 20;
+int playerScore = -1;
+
+double _lastTime;
+double _timeSinceLastSecondWentBy;
+
+CGRect screenRect;
 
 @implementation MyScene
 {
@@ -93,10 +99,15 @@ int maxNumTiles = 20;
     SKSpriteNode *_enemy;
     SKSpriteNode *_wiggling;
     NSArray *_wigglingFrames;
+    SKLabelNode *_playerScoreLabel;
 }
 
 -(id)initWithSize:(CGSize)size {    
     if (self = [super initWithSize:size]) {
+        
+        screenRect = self.scene.frame;
+        _screenWidth = screenRect.size.width;
+        _screenHeight = screenRect.size.height;
         
         //i want to see all the nodes, not just rendered ones
         [self.scene.view setValue:@(YES) forKey:@"_showsCulledNodesInNodeCount"];
@@ -109,6 +120,11 @@ int maxNumTiles = 20;
         _tileLayer = [SKNode node];
         [self addChild:_tileLayer];
         
+        _playerScoreLabel = [SKLabelNode labelNodeWithFontNamed:@"Menlo-Regular"];
+        _playerScoreLabel.fontSize = 30;
+        _playerScoreLabel.position = CGPointMake(_screenWidth - 100, _screenHeight-90);
+        _playerScoreLabel.text = @"Score: 0";
+        [self addChild:_playerScoreLabel];
         
         //self.backgroundColor = [SKColor colorWithRed:0.15 green:0.15 blue:0.3 alpha:1.0];
         
@@ -157,14 +173,21 @@ int maxNumTiles = 20;
 
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
-    if (_lastUpdateTime) {
-        _dt = currentTime - _lastUpdateTime;
-    } else {
-        _dt = 0;
-    }
-     _lastUpdateTime = currentTime;
+    // calculate deltaTime
+    double time = (double)CFAbsoluteTimeGetCurrent();
     
-    #pragma mark- tile update logic
+    float dt = time - _lastTime;
+    _lastTime = time;
+    
+    _timeSinceLastSecondWentBy += dt;
+    if(_timeSinceLastSecondWentBy > 1){
+        _timeSinceLastSecondWentBy = 0;
+        
+        [self spawnEnemies: arc4random_uniform(5)];
+        ++playerScore;
+        [self updateScoreLabel];
+    }
+    
     //this will update each tile node and keep track of the number of tiles
     SKAction *removeFromParent = [SKAction removeFromParent];
     [_tileLayer enumerateChildNodesWithName:@"wall" usingBlock:^(SKNode *node, BOOL *stop)
@@ -199,7 +222,6 @@ int maxNumTiles = 20;
          }];
 }
 
-#pragma mark spawn logic
 - (void)spawnWalls: (BOOL)firstTime
 {
     _tempNumTiles = arc4random_uniform(maxNumTiles-minNumTiles) + minNumTiles;
@@ -218,7 +240,11 @@ int maxNumTiles = 20;
         wall.yScale = 1;
         xPosition = firstTime ? (i * wall.size.width) + _screenWidth - 100 : ((i * wall.size.width) + _screenWidth) + (wall.size.width * 2);
         wall.position = CGPointMake(xPosition, yPosition);
+        wall.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:wall.size];
+        wall.physicsBody.usesPreciseCollisionDetection = YES;
         [_tileLayer addChild:wall];
+        wall.physicsBody.affectedByGravity = NO;
+        wall.physicsBody.dynamic = NO;
         ++onScreenTiles;
     }
     tileWidth = wall.size.width;
@@ -230,7 +256,8 @@ int maxNumTiles = 20;
     CGPoint location;
     for (int i = 0; i < numEnemies; i++)
     {
-        location = CGPointMake((arc4random_uniform(_screenWidth) + (_screenWidth/2)), 300);
+        location = CGPointMake((arc4random_uniform(400) + _screenWidth),
+                              arc4random_uniform(300) + 500);
         [self makeEnemy:location];
     }
 }
@@ -240,6 +267,7 @@ int maxNumTiles = 20;
     NSLog([NSString stringWithFormat:@"Location of enemy: %f,%f", location.x, location.y]);
     _enemy =[SKSpriteNode spriteNodeWithImageNamed:kEnemy];
     _enemy.position = location;
+    _enemy.name = @"enemy";
     
     NSMutableArray *wigglingText =[NSMutableArray array];
     
@@ -260,16 +288,15 @@ int maxNumTiles = 20;
     SKAction *moveLeft = [SKAction moveByX:-24 y:0 duration:0.1];
     [_wiggling runAction:[SKAction repeatActionForever:moveLeft]];
     
+    _wiggling.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:_enemy.size];
+    _wiggling.physicsBody.usesPreciseCollisionDetection = YES;
+    
     [_tileLayer addChild:_wiggling];
     [self walkingEnemy];
 }
 
 -(void)setup
 {
-    CGRect screenRect = self.scene.frame;
-    _screenWidth = screenRect.size.width;
-    _screenHeight = screenRect.size.height;
-    
     _player =[SKSpriteNode spriteNodeWithImageNamed:kPlayer];
     _player.position = CGPointMake(_screenWidth/4, _player.size.height/2);
     _player.zPosition =2;
@@ -293,11 +320,10 @@ int maxNumTiles = 20;
     _walking.position = CGPointMake(screenRect.size.width/2,screenRect.size.height/2);
     //_walking.position = CGPointMake(100, 100);
     
-     NSLog([NSString stringWithFormat:@"Location of player: %f,%f", _walking.position.x, _walking.position.y]);
-    
     [self addChild:_walking];
     [self walkingPlayer];
 }
+
 -(void)walkingPlayer
 {
     [_walking runAction:[SKAction repeatActionForever:
@@ -322,6 +348,19 @@ int maxNumTiles = 20;
 {
     [_jumping runAction:[SKAction animateWithTextures:_jumpingFrames timePerFrame:0.1f]];
     return;
+}
+
+
+-(void)didSimulatePhysics {
+    [self enumerateChildNodesWithName:@"enemy" usingBlock:^(SKNode *node, BOOL *stop) {
+        if (node.position.y < 0) [node removeFromParent];
+    }];
+}
+
+-(void)updateScoreLabel
+{
+    if (playerScore < 0) playerScore = 0;
+    _playerScoreLabel.text = [NSString stringWithFormat:@"Score: %d", playerScore];
 }
 
 @end
