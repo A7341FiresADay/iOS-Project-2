@@ -59,8 +59,10 @@ static inline CGFloat ScalarRandomRange(CGFloat min,
 
 static const float BG_POINTS=100;
 
-int tileWidth, randNumberX, onScreenTiles = 0;
+int tileWidth, _tempNumTiles, onScreenTiles = 0;
 int numWalls = 0;
+int minNumTiles = 8;
+int maxNumTiles = 20;
 
 @implementation MyScene
 {
@@ -68,6 +70,7 @@ int numWalls = 0;
     NSTimeInterval _dt;
     SKNode *_bglayer;
     SKNode *_tileLayer;
+    SKAction *_moveToLeft;
 }
 
 -(id)initWithSize:(CGSize)size {    
@@ -80,13 +83,15 @@ int numWalls = 0;
         _bglayer=[SKNode node];
         [self addChild:_bglayer];
         
-        //stuff node
+        //stuff node- where the meat and potatoes are.
         _tileLayer = [SKNode node];
         [self addChild:_tileLayer];
         
-        self.backgroundColor = [SKColor colorWithRed:0.15 green:0.15 blue:0.3 alpha:1.0];
+        //self.backgroundColor = [SKColor colorWithRed:0.15 green:0.15 blue:0.3 alpha:1.0];
         
         SKLabelNode *myLabel = [SKLabelNode labelNodeWithFontNamed:@"Menlo-Regular"];
+        
+        _moveToLeft = [SKAction moveByX:-4 y:0 duration:0.1];
         
         myLabel.text = @"Insert Game Here";
         myLabel.fontSize = 60;
@@ -105,25 +110,27 @@ int numWalls = 0;
             //look at chapter 5 page 136-141 for help about layers and correct positions of stuff
         }
         
+        //this section is just for reference- so I know where one tile's position is- delete soon
         SKSpriteNode *temp = [SKSpriteNode spriteNodeWithImageNamed:@"wall"];
         temp.name = @"temp";
         temp.xScale = 1;
         temp.yScale = 1;
         temp.position = CGPointMake(tileWidth, 480);
         [_tileLayer addChild:temp];
-        [self initWalls];
+        //-------------------------------------------------------------------------------------------------
+        
+        [self spawnWalls:TRUE];
     }
     return self;
 }
 
+//touch logic
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    /* Called when a touch begins */
     SKScene *_gameOverScene = [[GameOverScene alloc] initWithSize:self.size];
     [self.view presentScene:_gameOverScene];
 }
 
 -(void)update:(CFTimeInterval)currentTime {
-    //NSLog(@"updating");
     /* Called before each frame is rendered */
     if (_lastUpdateTime) {
         _dt = currentTime - _lastUpdateTime;
@@ -132,40 +139,28 @@ int numWalls = 0;
     }
      _lastUpdateTime = currentTime;
     
-    //NSLog([NSString stringWithFormat:@"BGLAYER's position: %f", _bglayer.position.x]);
-    //NSLog([NSString stringWithFormat:@"onScreenTiles: %d", onScreenTiles]);
+    #pragma mark- tile update logic
+    //this will update each tile node and keep track of the number of tiles
     SKAction *removeFromParent = [SKAction removeFromParent];
-    SKAction *moveToLeft = [SKAction moveByX:-4 y:0 duration:0.01];
-    [_bglayer enumerateChildNodesWithName:@"wall" usingBlock:^(SKNode *node, BOOL *stop)
+    [_tileLayer enumerateChildNodesWithName:@"wall" usingBlock:^(SKNode *node, BOOL *stop)
      {
-         //NSLog([NSString stringWithFormat:@"node.position.x: %f", node.position.x]);
-         //NSLog([NSString stringWithFormat:@"tileWidth - bglayer.position: %f", (tileWidth- _bglayer.position.x)]);
-         //NSLog([NSString stringWithFormat:@"node: %@", node]);
-         [node runAction: [SKAction repeatActionForever:moveToLeft]];
-            if (node.position.x < tileWidth - _bglayer.position.x)
+         [node runAction: _moveToLeft];
+            if (node.position.x < 0)
             {
-                //NSLog([NSString stringWithFormat:@"Removing a tile"]);
                 --onScreenTiles;
                 [node runAction:removeFromParent];
             }
          if (onScreenTiles < 10 || onScreenTiles < 0)
          {
-             NSLog([NSString stringWithFormat: @"calling spawnWalls because on screen tiles is %d", onScreenTiles]);
-             [self spawnWalls];
+             [self spawnWalls:FALSE];
          }
      }];
     
-   /* if (onScreenTiles < 10 || onScreenTiles < 0)
-    {
-        NSLog([NSString stringWithFormat: @"calling spawnWalls because on screen tiles is %d", onScreenTiles]);
-        [self spawnWalls];
-    }*/
     [self moveBG];
 }
 //moves the background and recycles it so it loops forever
 -(void)moveBG
 {
-         //SKSpriteNode *bg = (SKSpriteNode *)node;
          CGPoint bgVelocity = CGPointMake(-BG_POINTS,0);
          CGPoint amtToMove= CGPointMultiplyScalar(bgVelocity, _dt);
          _bglayer.position = CGPointAdd(_bglayer.position,amtToMove);
@@ -179,58 +174,30 @@ int numWalls = 0;
          }];
 }
 
-- (void)spawnWalls
-{                                           //(upper bound-lower bound)+lower bound
-    randNumberX = (((float)arc4random()/0x100000000)*((20-5)+5));
-    
-    SKSpriteNode *wall;
-    for (int i = 0; i < randNumberX; i++)
-    {
-        /*SKSpriteNode */wall = [SKSpriteNode spriteNodeWithImageNamed:@"wall"];
-        wall.name = @"wall";
-        wall.xScale = 2;
-        wall.yScale = 1;
-        wall.position = CGPointMake((i * wall.size.width) + (wall.size.width * 6), 380);
-        [_tileLayer addChild:wall];
-        ++onScreenTiles;
-    }
-    tileWidth = wall.size.width;
-    NSLog([NSString stringWithFormat:@"spawned %d new walls, now there should be %d", randNumberX, onScreenTiles]);
-    randNumberX = 0;
-}
-
-- (void)initWalls
-{                                           //(upper bound-lower bound)+lower bound
-    randNumberX = (((float)arc4random()/0x100000000)*((20-5)+5));
-    
-    SKSpriteNode *wall;
-    for (int i = 0; i < randNumberX; i++)
-    {
-        /*SKSpriteNode */wall = [SKSpriteNode spriteNodeWithImageNamed:@"wall"];
-        wall.name = @"wall";
-        wall.xScale = 2;
-        wall.yScale = 1;
-            //spawn close to the right side of the screen
-        wall.position = CGPointMake((i * wall.size.width) + self.scene.size.width - 100, 380);
-        [_tileLayer addChild:wall];
-        ++onScreenTiles;
-    }
-    tileWidth = wall.size.width;
-    NSLog([NSString stringWithFormat:@"Initializing walls, %d of them! and rand was %d", onScreenTiles, randNumberX]);
-    randNumberX = 0;
-    
-}
-
-- (int) countWalls
+#pragma mark spawn logic
+- (void)spawnWalls: (BOOL)firstTime
 {
-    numWalls = 0;
-    [_tileLayer enumerateChildNodesWithName:@"wall" usingBlock:^(SKNode *node, BOOL *stop)
-     {
-         numWalls++;
-         if (node.position.x < tileWidth/2)
-             NSLog(@"SHOULD BE REMOVING");
-     }];
-    return numWalls;
+    _tempNumTiles = arc4random_uniform(maxNumTiles-minNumTiles) + minNumTiles;
+    
+    int randNumY= arc4random_uniform(2) + 1; //3 levels
+    int xPosition;
+    
+    //if its the first time, spawn it on level 1 (380) otherwise randomize which level it's on
+    int yPosition = firstTime ? 380 : (380 - ((randNumY-1) * 150));
+    SKSpriteNode *wall;
+    for (int i = 0; i < _tempNumTiles; i++)
+    {
+        wall = [SKSpriteNode spriteNodeWithImageNamed:@"wall"];
+        wall.name = @"wall";
+        wall.xScale = 2;
+        wall.yScale = 1;
+        xPosition = firstTime ? (i * wall.size.width) + self.scene.size.width - 100 : (i * wall.size.width) + (wall.size.width * 6);
+        wall.position = CGPointMake(xPosition, yPosition);
+        [_tileLayer addChild:wall];
+        ++onScreenTiles;
+    }
+    tileWidth = wall.size.width;
+    _tempNumTiles = 0;
 }
 
 @end
