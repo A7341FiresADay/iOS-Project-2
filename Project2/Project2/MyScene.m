@@ -79,6 +79,7 @@ int maxNumTiles = 20;
     SKNode *_tileLayer;
     SKAction *_moveToLeft;
     SKSpriteNode *_currentEnemy;
+    int _stage_width, _stage_height;
 }
 
 -(id)initWithSize:(CGSize)size {    
@@ -95,13 +96,16 @@ int maxNumTiles = 20;
         _tileLayer = [SKNode node];
         [self addChild:_tileLayer];
         
+        _stage_height = self.scene.size.height;
+        _stage_width = self.scene.size.width;
+        
         //self.backgroundColor = [SKColor colorWithRed:0.15 green:0.15 blue:0.3 alpha:1.0];
         
         _moveToLeft = [SKAction moveByX:-4 y:0 duration:0.1];
 
         for(int i =0; i<2;i++)
         {
-            SKSpriteNode *bg= [SKSpriteNode spriteNodeWithImageNamed:@"background"];
+            SKSpriteNode *bg= [SKSpriteNode spriteNodeWithImageNamed:@"fullBackground"];//was just "background"
             bg.anchorPoint = CGPointZero;
             bg.position = CGPointMake(i *bg.size.width, 0);
             bg.name =@"bg";
@@ -109,15 +113,6 @@ int maxNumTiles = 20;
             
             //look at chapter 5 page 136-141 for help about layers and correct positions of stuff
         }
-        
-        //this section is just for reference- so I know where one tile's position is- delete soon
-        SKSpriteNode *temp = [SKSpriteNode spriteNodeWithImageNamed:@"wall"];
-        temp.name = @"temp";
-        temp.xScale = 1;
-        temp.yScale = 1;
-        temp.position = CGPointMake(tileWidth, 480);
-        [_tileLayer addChild:temp];
-        //-------------------------------------------------------------------------------------------------
         
         [self spawnWalls:TRUE];
     }
@@ -191,13 +186,23 @@ int maxNumTiles = 20;
         wall.name = @"wall";
         wall.xScale = 2;
         wall.yScale = 1;
-        xPosition = firstTime ? (i * wall.size.width) + self.scene.size.width - 100 : ((i * wall.size.width) + self.scene.size.width) + (wall.size.width * 2);
+        xPosition = firstTime ? (i * wall.size.width) + _stage_width - 100 : ((i * wall.size.width) + _stage_width) + (wall.size.width * 2);
         wall.position = CGPointMake(xPosition, yPosition);
         [_tileLayer addChild:wall];
         ++onScreenTiles;
     }
     tileWidth = wall.size.width;
     _tempNumTiles = 0;
+}
+
+-(void) spawnEnemies: (int) numEnemies
+{
+    CGPoint location;
+    for (int i = 0; i < numEnemies; i++)
+    {
+        location = CGPointMake((arc4random_uniform(_stage_width) + (_stage_width/2)), -500);
+        [self makeEnemy:location];
+    }
 }
 
 -(void)makeEnemy: (CGPoint) location
