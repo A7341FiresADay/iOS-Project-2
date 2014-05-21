@@ -8,6 +8,7 @@
 
 #import "MyScene.h"
 #import "GameOverScene.h"
+#import <AVFoundation/AVFoundation.h>
 
 /*background Image: http://wall.alphacoders.com/big.php?i=414068 
  http://wallpaperbackgrounds.com/wallpaper/20608
@@ -64,6 +65,8 @@ static inline CGFloat ScalarRandomRange(CGFloat min,
                   (max - min) + min);
 }
 
+NSString *const kPlayer = @"harry1.png";
+
 static const float BG_POINTS=100;
 
 int tileWidth, _tempNumTiles, onScreenTiles = 0;
@@ -77,9 +80,15 @@ int maxNumTiles = 20;
     NSTimeInterval _dt;
     SKNode *_bglayer;
     SKNode *_tileLayer;
+    CGFloat _screenWidth;
+    CGFloat _screenHeight;
+    SKSpriteNode *_player;
+    SKSpriteNode *_walking;
+    SKSpriteNode *_jumping;
+    NSArray *_walkingFrames;
+    NSArray *_jumpingFrames;
     SKAction *_moveToLeft;
     SKSpriteNode *_currentEnemy;
-    int _stage_width, _stage_height;
 }
 
 -(id)initWithSize:(CGSize)size {    
@@ -96,8 +105,6 @@ int maxNumTiles = 20;
         _tileLayer = [SKNode node];
         [self addChild:_tileLayer];
         
-        _stage_height = self.scene.size.height;
-        _stage_width = self.scene.size.width;
         
         //self.backgroundColor = [SKColor colorWithRed:0.15 green:0.15 blue:0.3 alpha:1.0];
         
@@ -115,14 +122,32 @@ int maxNumTiles = 20;
         }
         
         [self spawnWalls:TRUE];
+        [self setup];
     }
     return self;
 }
 
 //touch logic
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    SKScene *_gameOverScene = [[GameOverScene alloc] initWithSize:self.size];
-    [self.view presentScene:_gameOverScene];
+    NSMutableArray *jumpingArray =[NSMutableArray array];
+    
+    SKTextureAtlas *jumpingAtles =[SKTextureAtlas atlasNamed:@"jumping"];
+    
+    int image = jumpingAtles.textureNames.count;
+    for(int i=1; i<= image;i++)
+    {
+        NSString *textureName =[NSString stringWithFormat:@"jump%d",i];
+        SKTexture *temp = [jumpingAtles textureNamed:textureName];
+        [jumpingArray addObject:temp];
+    }
+    _jumpingFrames = jumpingArray;
+    SKTexture *temp = _walkingFrames[0];
+    _jumping = [SKSpriteNode spriteNodeWithTexture:temp];
+    _jumping.position = CGPointMake(100,500);
+    //_walking.position = CGPointMake(100, 100);
+    
+    [self addChild:_jumping];
+    [self runAction:[SKAction sequence:@[]]];
 }
 
 -(void)update:(CFTimeInterval)currentTime {
@@ -186,7 +211,7 @@ int maxNumTiles = 20;
         wall.name = @"wall";
         wall.xScale = 2;
         wall.yScale = 1;
-        xPosition = firstTime ? (i * wall.size.width) + _stage_width - 100 : ((i * wall.size.width) + _stage_width) + (wall.size.width * 2);
+        xPosition = firstTime ? (i * wall.size.width) + _screenWidth - 100 : ((i * wall.size.width) + _screenWidth) + (wall.size.width * 2);
         wall.position = CGPointMake(xPosition, yPosition);
         [_tileLayer addChild:wall];
         ++onScreenTiles;
@@ -200,7 +225,7 @@ int maxNumTiles = 20;
     CGPoint location;
     for (int i = 0; i < numEnemies; i++)
     {
-        location = CGPointMake((arc4random_uniform(_stage_width) + (_stage_width/2)), -500);
+        location = CGPointMake((arc4random_uniform(_screenWidth) + (_screenWidth/2)), -500);
         [self makeEnemy:location];
     }
 }
@@ -211,6 +236,54 @@ int maxNumTiles = 20;
     _currentEnemy = [SKSpriteNode spriteNodeWithImageNamed:@"enemyPictureHere"];
     _currentEnemy.position = location;
     [_tileLayer addChild:_currentEnemy];
+}
+
+-(void)setup
+{
+    CGRect screenRect = self.scene.frame;
+    _screenWidth = screenRect.size.width;
+    _screenHeight = screenRect.size.height;
+    
+    _player =[SKSpriteNode spriteNodeWithImageNamed:kPlayer];
+    _player.position = CGPointMake(_screenWidth/4, _player.size.height/2);
+    _player.zPosition =2;
+    
+    //[self addChild:_player];
+    
+    NSMutableArray *walkingText =[NSMutableArray array];
+    
+    SKTextureAtlas *walkingAtles =[SKTextureAtlas atlasNamed:@"sprite"];
+    
+    int image = walkingAtles.textureNames.count;
+    for(int i=1; i<= image;i++)
+    {
+        NSString *textureName =[NSString stringWithFormat:@"harry%d",i];
+        SKTexture *temp = [walkingAtles textureNamed:textureName];
+        [walkingText addObject:temp];
+    }
+    _walkingFrames = walkingText;
+    SKTexture *temp = _walkingFrames[0];
+    _walking = [SKSpriteNode spriteNodeWithTexture:temp];
+    _walking.position = CGPointMake(screenRect.size.width/2,screenRect.size.height/2);
+    //_walking.position = CGPointMake(100, 100);
+    
+    [self addChild:_walking];
+    [self walkingPlayer];
+}
+-(void)walkingPlayer
+{
+    [_walking runAction:[SKAction repeatActionForever:
+                         [SKAction animateWithTextures:_walkingFrames
+                                          timePerFrame:0.1f
+                                                resize:YES
+                                               restore:YES]] withKey:@"WalkingPlayer"];
+    return;
+}
+
+-(void)jumpingPlayer
+{
+    [_jumping runAction:[SKAction animateWithTextures:_jumpingFrames timePerFrame:0.1f]];
+    return;
 }
 
 @end

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		0772CE05191B050C00F9156D /* wall.png in Resources */ = {isa = PBXBuildFile; fileRef = 0772CE04191B050C00F9156D /* wall.png */; };
+		3F456EBE192CF39900D93F11 /* fullBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = 3F456EBD192CF39900D93F11 /* fullBackground.png */; };
+		3F456EC0192D02C300D93F11 /* sprite.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 3F456EBF192D02C300D93F11 /* sprite.atlas */; };
 		3F482C0819195FAD000AE47A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F482C0719195FAD000AE47A /* Foundation.framework */; };
 		3F482C0A19195FAD000AE47A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F482C0919195FAD000AE47A /* CoreGraphics.framework */; };
 		3F482C0C19195FAD000AE47A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F482C0B19195FAD000AE47A /* UIKit.framework */; };
@@ -42,6 +44,8 @@
 
 /* Begin PBXFileReference section */
 		0772CE04191B050C00F9156D /* wall.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wall.png; sourceTree = "<group>"; };
+		3F456EBD192CF39900D93F11 /* fullBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fullBackground.png; sourceTree = "<group>"; };
+		3F456EBF192D02C300D93F11 /* sprite.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = sprite.atlas; sourceTree = "<group>"; };
 		3F482C0419195FAD000AE47A /* Project2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Project2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F482C0719195FAD000AE47A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		3F482C0919195FAD000AE47A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -111,6 +115,8 @@
 		3F482BFB19195FAD000AE47A = {
 			isa = PBXGroup;
 			children = (
+				3F456EBF192D02C300D93F11 /* sprite.atlas */,
+				3F456EBD192CF39900D93F11 /* fullBackground.png */,
 				0772CE04191B050C00F9156D /* wall.png */,
 				3FFE3E1D191ACF99002A47A3 /* background@2x.png */,
 				3F482C0F19195FAD000AE47A /* Project2 */,
@@ -235,6 +241,9 @@
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = WEAREORGANIZED;
 				TargetAttributes = {
+					3F482C0319195FAD000AE47A = {
+						DevelopmentTeam = KT6L3A8T5R;
+					};
 					3F482C2B19195FAD000AE47A = {
 						TestTargetID = 3F482C0319195FAD000AE47A;
 					};
@@ -265,10 +274,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				3F482C1419195FAD000AE47A /* InfoPlist.strings in Resources */,
+				3F456EBE192CF39900D93F11 /* fullBackground.png in Resources */,
 				3F482C2719195FAD000AE47A /* Images.xcassets in Resources */,
 				3F482C2519195FAD000AE47A /* Spaceship.png in Resources */,
 				3FFE3E1E191ACF99002A47A3 /* background@2x.png in Resources */,
 				3F482C1D19195FAD000AE47A /* Main.storyboard in Resources */,
+				3F456EC0192D02C300D93F11 /* sprite.atlas in Resources */,
 				0772CE05191B050C00F9156D /* wall.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -422,10 +433,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Project2/Project2-Prefix.pch";
 				INFOPLIST_FILE = "Project2/Project2-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				SPRITEKIT_TEXTURE_ATLAS_OUTPUT = YES;
 				WRAPPER_EXTENSION = app;
 			};
@@ -436,10 +450,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Project2/Project2-Prefix.pch";
 				INFOPLIST_FILE = "Project2/Project2-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				SPRITEKIT_TEXTURE_ATLAS_OUTPUT = YES;
 				WRAPPER_EXTENSION = app;
 			};
