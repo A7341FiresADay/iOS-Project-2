@@ -89,16 +89,8 @@ int maxNumTiles = 20;
         
         //self.backgroundColor = [SKColor colorWithRed:0.15 green:0.15 blue:0.3 alpha:1.0];
         
-        SKLabelNode *myLabel = [SKLabelNode labelNodeWithFontNamed:@"Menlo-Regular"];
-        
         _moveToLeft = [SKAction moveByX:-4 y:0 duration:0.1];
-        
-        myLabel.text = @"Insert Game Here";
-        myLabel.fontSize = 60;
-        myLabel.position = CGPointMake(CGRectGetMidX(self.frame),
-                                       CGRectGetMidY(self.frame));
-        
-        [self addChild:myLabel];
+
         for(int i =0; i<2;i++)
         {
             SKSpriteNode *bg= [SKSpriteNode spriteNodeWithImageNamed:@"background"];
@@ -191,7 +183,7 @@ int maxNumTiles = 20;
         wall.name = @"wall";
         wall.xScale = 2;
         wall.yScale = 1;
-        xPosition = firstTime ? (i * wall.size.width) + self.scene.size.width - 100 : (i * wall.size.width) + (wall.size.width * 6);
+        xPosition = firstTime ? (i * wall.size.width) + self.scene.size.width - 100 : ((i * wall.size.width) + self.scene.size.width) + (wall.size.width * 2);
         wall.position = CGPointMake(xPosition, yPosition);
         [_tileLayer addChild:wall];
         ++onScreenTiles;
