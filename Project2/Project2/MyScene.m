@@ -66,6 +66,7 @@ static inline CGFloat ScalarRandomRange(CGFloat min,
 }
 
 NSString *const kPlayer = @"harry1.png";
+NSString *const kEnemy = @"worm1.png";
 
 static const float BG_POINTS=100;
 
@@ -89,6 +90,9 @@ int maxNumTiles = 20;
     NSArray *_jumpingFrames;
     SKAction *_moveToLeft;
     SKSpriteNode *_currentEnemy;
+    SKSpriteNode *_enemy;
+    SKSpriteNode *_wiggling;
+    NSArray *_wigglingFrames;
 }
 
 -(id)initWithSize:(CGSize)size {    
@@ -112,7 +116,7 @@ int maxNumTiles = 20;
 
         for(int i =0; i<2;i++)
         {
-            SKSpriteNode *bg= [SKSpriteNode spriteNodeWithImageNamed:@"fullBackground"];//was just "background"
+            SKSpriteNode *bg= [SKSpriteNode spriteNodeWithImageNamed:@"Background"];
             bg.anchorPoint = CGPointZero;
             bg.position = CGPointMake(i *bg.size.width, 0);
             bg.name =@"bg";
@@ -123,6 +127,7 @@ int maxNumTiles = 20;
         
         [self spawnWalls:TRUE];
         [self setup];
+        [self spawnEnemies:1];
     }
     return self;
 }
@@ -225,17 +230,38 @@ int maxNumTiles = 20;
     CGPoint location;
     for (int i = 0; i < numEnemies; i++)
     {
-        location = CGPointMake((arc4random_uniform(_screenWidth) + (_screenWidth/2)), -500);
+        location = CGPointMake((arc4random_uniform(_screenWidth) + (_screenWidth/2)), 300);
         [self makeEnemy:location];
     }
 }
 
 -(void)makeEnemy: (CGPoint) location
 {
-    #pragma fix me when you get an enemy image
-    _currentEnemy = [SKSpriteNode spriteNodeWithImageNamed:@"enemyPictureHere"];
-    _currentEnemy.position = location;
-    [_tileLayer addChild:_currentEnemy];
+    NSLog([NSString stringWithFormat:@"Location of enemy: %f,%f", location.x, location.y]);
+    _enemy =[SKSpriteNode spriteNodeWithImageNamed:kEnemy];
+    _enemy.position = location;
+    
+    NSMutableArray *wigglingText =[NSMutableArray array];
+    
+    SKTextureAtlas *wormAtlas =[SKTextureAtlas atlasNamed:@"worm"];
+    
+    int image = wormAtlas.textureNames.count;
+    for(int i=1; i<= image;i++)
+    {
+        NSString *textureName =[NSString stringWithFormat:@"worm%d",i];
+        SKTexture *temp = [wormAtlas textureNamed:textureName];
+        [wigglingText addObject:temp];
+    }
+    _wigglingFrames = wigglingText;
+    SKTexture *temp = _wigglingFrames[0];
+    _wiggling = [SKSpriteNode spriteNodeWithTexture:temp];
+    _wiggling.position = location;
+    
+    SKAction *moveLeft = [SKAction moveByX:-24 y:0 duration:0.1];
+    [_wiggling runAction:[SKAction repeatActionForever:moveLeft]];
+    
+    [_tileLayer addChild:_wiggling];
+    [self walkingEnemy];
 }
 
 -(void)setup
@@ -267,6 +293,8 @@ int maxNumTiles = 20;
     _walking.position = CGPointMake(screenRect.size.width/2,screenRect.size.height/2);
     //_walking.position = CGPointMake(100, 100);
     
+     NSLog([NSString stringWithFormat:@"Location of player: %f,%f", _walking.position.x, _walking.position.y]);
+    
     [self addChild:_walking];
     [self walkingPlayer];
 }
@@ -277,6 +305,16 @@ int maxNumTiles = 20;
                                           timePerFrame:0.1f
                                                 resize:YES
                                                restore:YES]] withKey:@"WalkingPlayer"];
+    return;
+}
+
+-(void)walkingEnemy
+{
+    [_wiggling runAction:[SKAction repeatActionForever:
+                         [SKAction animateWithTextures:_wigglingFrames
+                                          timePerFrame:0.1f
+                                                resize:YES
+                                               restore:YES]] withKey:@"WalkingEnemy"];
     return;
 }
 

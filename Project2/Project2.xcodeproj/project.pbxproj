@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		0772CE05191B050C00F9156D /* wall.png in Resources */ = {isa = PBXBuildFile; fileRef = 0772CE04191B050C00F9156D /* wall.png */; };
-		3F456EBE192CF39900D93F11 /* fullBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = 3F456EBD192CF39900D93F11 /* fullBackground.png */; };
 		3F456EC0192D02C300D93F11 /* sprite.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 3F456EBF192D02C300D93F11 /* sprite.atlas */; };
 		3F482C0819195FAD000AE47A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F482C0719195FAD000AE47A /* Foundation.framework */; };
 		3F482C0A19195FAD000AE47A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F482C0919195FAD000AE47A /* CoreGraphics.framework */; };
@@ -29,6 +28,8 @@
 		3F482C3A19195FAD000AE47A /* Project2Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F482C3919195FAD000AE47A /* Project2Tests.m */; };
 		3F482C451919601F000AE47A /* MenuView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F482C441919601F000AE47A /* MenuView.m */; };
 		3F482C4819196655000AE47A /* GameOverScene.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F482C4719196655000AE47A /* GameOverScene.m */; };
+		3FBB4735192D099B000519D2 /* worm.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 3FBB4734192D099B000519D2 /* worm.atlas */; };
+		3FBB4737192D0CB6000519D2 /* Background.png in Resources */ = {isa = PBXBuildFile; fileRef = 3FBB4736192D0CB6000519D2 /* Background.png */; };
 		3FFE3E1E191ACF99002A47A3 /* background@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3FFE3E1D191ACF99002A47A3 /* background@2x.png */; };
 /* End PBXBuildFile section */
 
@@ -44,7 +45,6 @@
 
 /* Begin PBXFileReference section */
 		0772CE04191B050C00F9156D /* wall.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wall.png; sourceTree = "<group>"; };
-		3F456EBD192CF39900D93F11 /* fullBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fullBackground.png; sourceTree = "<group>"; };
 		3F456EBF192D02C300D93F11 /* sprite.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = sprite.atlas; sourceTree = "<group>"; };
 		3F482C0419195FAD000AE47A /* Project2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Project2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F482C0719195FAD000AE47A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -73,6 +73,8 @@
 		3F482C441919601F000AE47A /* MenuView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MenuView.m; path = ../MenuView.m; sourceTree = "<group>"; };
 		3F482C4619196655000AE47A /* GameOverScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameOverScene.h; sourceTree = "<group>"; };
 		3F482C4719196655000AE47A /* GameOverScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameOverScene.m; sourceTree = "<group>"; };
+		3FBB4734192D099B000519D2 /* worm.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = worm.atlas; sourceTree = "<group>"; };
+		3FBB4736192D0CB6000519D2 /* Background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Background.png; sourceTree = "<group>"; };
 		3FFE3E1D191ACF99002A47A3 /* background@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "background@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -115,8 +117,9 @@
 		3F482BFB19195FAD000AE47A = {
 			isa = PBXGroup;
 			children = (
+				3FBB4736192D0CB6000519D2 /* Background.png */,
+				3FBB4734192D099B000519D2 /* worm.atlas */,
 				3F456EBF192D02C300D93F11 /* sprite.atlas */,
-				3F456EBD192CF39900D93F11 /* fullBackground.png */,
 				0772CE04191B050C00F9156D /* wall.png */,
 				3FFE3E1D191ACF99002A47A3 /* background@2x.png */,
 				3F482C0F19195FAD000AE47A /* Project2 */,
@@ -274,11 +277,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				3F482C1419195FAD000AE47A /* InfoPlist.strings in Resources */,
-				3F456EBE192CF39900D93F11 /* fullBackground.png in Resources */,
 				3F482C2719195FAD000AE47A /* Images.xcassets in Resources */,
 				3F482C2519195FAD000AE47A /* Spaceship.png in Resources */,
+				3FBB4735192D099B000519D2 /* worm.atlas in Resources */,
 				3FFE3E1E191ACF99002A47A3 /* background@2x.png in Resources */,
 				3F482C1D19195FAD000AE47A /* Main.storyboard in Resources */,
+				3FBB4737192D0CB6000519D2 /* Background.png in Resources */,
 				3F456EC0192D02C300D93F11 /* sprite.atlas in Resources */,
 				0772CE05191B050C00F9156D /* wall.png in Resources */,
 			);
