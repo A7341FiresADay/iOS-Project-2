@@ -72,6 +72,10 @@ int numWalls = 0;
 
 -(id)initWithSize:(CGSize)size {    
     if (self = [super initWithSize:size]) {
+        
+        //i want to see all the nodes, not just rendered ones
+        [self.scene.view setValue:@(YES) forKey:@"_showsCulledNodesInNodeCount"];
+        
         //set background node
         _bglayer=[SKNode node];
         [self addChild:_bglayer];
