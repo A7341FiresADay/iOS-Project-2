@@ -9,6 +9,13 @@
 #import "MyScene.h"
 #import "GameOverScene.h"
 
+/*background Image: http://wall.alphacoders.com/big.php?i=414068 
+ http://wallpaperbackgrounds.com/wallpaper/20608
+ */
+
+
+
+
 //these were used so commonly in the iOS games book we just c/p'd them here.
 static inline CGPoint CGPointAdd(const CGPoint a,
                                  const CGPoint b)
@@ -71,6 +78,7 @@ int maxNumTiles = 20;
     SKNode *_bglayer;
     SKNode *_tileLayer;
     SKAction *_moveToLeft;
+    SKSpriteNode *_currentEnemy;
 }
 
 -(id)initWithSize:(CGSize)size {    
@@ -190,6 +198,14 @@ int maxNumTiles = 20;
     }
     tileWidth = wall.size.width;
     _tempNumTiles = 0;
+}
+
+-(void)makeEnemy: (CGPoint) location
+{
+    #pragma fix me when you get an enemy image
+    _currentEnemy = [SKSpriteNode spriteNodeWithImageNamed:@"enemyPictureHere"];
+    _currentEnemy.position = location;
+    [_tileLayer addChild:_currentEnemy];
 }
 
 @end
