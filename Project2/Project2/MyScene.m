@@ -122,10 +122,16 @@ CGFloat nearestYValue;
     int isJumping;
     
     AVAudioPlayer *_backgroundPlayer;
+    AVAudioPlayer *_foleySoundPlayer;
 }
 
 -(id)initWithSize:(CGSize)size {    
     if (self = [super initWithSize:size]) {
+        
+        playerScore = 0;
+        [self updateScoreLabel];
+        
+        onScreenTiles = 0;
         
         screenRect = self.scene.frame;
         _screenWidth = screenRect.size.width;
@@ -213,11 +219,12 @@ CGFloat nearestYValue;
     /* Called before each frame is rendered */
     // calculate deltaTime
     
+    /*if (isWalking) NSLog(@"Walking");
+    else NSLog(@"Jumping");*/
+    
     if (_walking.position.y < 0)
     {
-        SKScene *gameEnd = [[GameOverScene alloc] initWithSize:screenRect.size];
-        
-        [self.view presentScene:gameEnd];
+        [self goToGameEnd];
     }
     
     double time = (double)CFAbsoluteTimeGetCurrent();
@@ -278,6 +285,8 @@ CGFloat nearestYValue;
 
 - (void)spawnWalls: (BOOL)firstTime
 {
+    if (firstTime)  NSLog(@"Spawning walls for first time");
+    else     NSLog(@"Spawning walls for NOT the first time");
     _tempNumTiles = arc4random_uniform(maxNumTiles-minNumTiles) + minNumTiles;
     
     int randNumY= arc4random_uniform(2) + 1; //3 levels
@@ -390,6 +399,7 @@ CGFloat nearestYValue;
     _walking.physicsBody.dynamic = YES;
     _walking.physicsBody.collisionBitMask = kCategoryEnemyMask;// | kCategoryTileMask;
     _walking.physicsBody.usesPreciseCollisionDetection = YES;
+    _walking.physicsBody.allowsRotation = FALSE;
     
     //NSLog(@"Starting to Walk");
     //jumpDestination = CGPointMake(_walking.position.x, _walking.position.y + 50);
@@ -400,6 +410,7 @@ CGFloat nearestYValue;
 
 -(void)walkingPlayer
 {
+    isWalking = true;
     [_walking runAction:[SKAction repeatActionForever:
                          [SKAction animateWithTextures:_walkingFrames
                                           timePerFrame:0.1f
@@ -438,7 +449,7 @@ CGFloat nearestYValue;
     
     
     [_jumping runAction:[SKAction sequence:@[animate,move, pause, sink, remove]]];
-    isWalking = true;
+    //isWalking = true;
     //if(isWalking)
     //{
     newDestination = _jumping.position;
@@ -488,25 +499,41 @@ CGFloat nearestYValue;
         //if first body is player and second is Enemy
         if (((firstBody.categoryBitMask & kCategoryPlayerMask) != 0) && ((secondBody.categoryBitMask & kCategoryEnemyMask) !=0))
         {
-            if (isWalking)
+            NSLog(@"First body is player, second is enemy");
+            if (!isWalking)
             {
+                NSLog(@"Player is not walking");
                 [secondBody.node removeFromParent];
+                NSLog(@"Removing secondBody (enemy)");
+                ++playerScore;
+                [self playSound:@"enemyDying.mp3"];
+                [self updateScoreLabel];
                 return;
             }
-            [firstBody.node removeFromParent];
-                
-        }
-        else if (((firstBody.categoryBitMask & kCategoryEnemyMask) != 0) && ((secondBody.categoryBitMask & kCategoryPlayerMask) !=0))
-        {
-            if (isWalking)
-            {
-                [firstBody.node removeFromParent];
-                return;
+            //[firstBody.node removeFromParent];
+            //NSLog(@"aw u dead");
+            else {
+                NSLog(@"player IS walking and should die");
+                [self playSound:@"moan.mp3"];
+                [self goToGameEnd];
             }
-            [secondBody.node removeFromParent];
         }
         else
-            NSLog(@"Somethin's fucked up");
+        {
+            NSLog(@"First body is enemy, second is player");
+            if (isWalking)
+            {
+                NSLog(@"player is walking, you should die");
+                [self playSound:@"moan.mp3"];
+                [self goToGameEnd];
+                return;
+            }
+            NSLog(@"Removing an enemy (first body) since player is not walking");
+            [secondBody.node removeFromParent];
+            ++playerScore;
+            [self playSound:@"enemyDying.mp3"];
+            [self updateScoreLabel];
+        }
     }
     else
     {
@@ -522,6 +549,22 @@ CGFloat nearestYValue;
     _backgroundPlayer.numberOfLoops =-1;
     [_backgroundPlayer prepareToPlay];
     [_backgroundPlayer play];
+}
+-(void)playSound:(NSString *)filename
+{
+    NSError *error;
+    NSURL *backgroundURL =[[NSBundle mainBundle]URLForResource:filename withExtension:nil];
+    _foleySoundPlayer =[[AVAudioPlayer alloc]initWithContentsOfURL:backgroundURL error:&error];
+    _foleySoundPlayer.numberOfLoops =1;
+    [_foleySoundPlayer prepareToPlay];
+    [_foleySoundPlayer play];
+}
+
+-(void) goToGameEnd
+{
+    SKScene *gameEnd = [[GameOverScene alloc] initWithSize:screenRect.size];
+    
+    [self.view presentScene:gameEnd];
 }
 
 @end
