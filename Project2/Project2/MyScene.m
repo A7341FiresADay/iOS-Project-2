@@ -10,6 +10,8 @@
 #import "GameOverScene.h"
 #import <CoreMotion/CoreMotion.h>
 #import <AVFoundation/AVFoundation.h>
+#import "GameOverScene.h"
+#import "MenuView.h"
 
 @import AVFoundation;
 
@@ -93,6 +95,9 @@ double _lastTime;
 double _timeSinceLastSecondWentBy;
 
 CGRect screenRect;
+CGPoint jumpDestination, newDestination;
+CGFloat previousPlayerYValue;
+CGFloat nearestYValue;
 
 @implementation MyScene
 {
@@ -117,10 +122,16 @@ CGRect screenRect;
     int isJumping;
     
     AVAudioPlayer *_backgroundPlayer;
+    AVAudioPlayer *_foleySoundPlayer;
 }
 
 -(id)initWithSize:(CGSize)size {    
     if (self = [super initWithSize:size]) {
+        
+        playerScore = 0;
+        [self updateScoreLabel];
+        
+        onScreenTiles = 0;
         
         screenRect = self.scene.frame;
         _screenWidth = screenRect.size.width;
@@ -163,11 +174,17 @@ CGRect screenRect;
         
         isWalking = true;
         [self spawnWalls:TRUE];
-        [self setup];
+        [self setup:TRUE];
         
         [self playbgMusic:@"Loop.mp3"];
     }
     return self;
+}
+
+//i'm using this only to compare distance, so no need to square root it.
+- (CGFloat) distance: (CGPoint) a : (CGPoint) b
+{
+    return ((a.x - b.x)*(a.x-b.x) + (a.y -b.y)*(a.y-b.y));
 }
 
 //touch logic
@@ -201,6 +218,15 @@ CGRect screenRect;
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
     // calculate deltaTime
+    
+    /*if (isWalking) NSLog(@"Walking");
+    else NSLog(@"Jumping");*/
+    
+    if (_walking.position.y < 0)
+    {
+        [self goToGameEnd];
+    }
+    
     double time = (double)CFAbsoluteTimeGetCurrent();
     
     float dt = time - _lastTime;
@@ -215,10 +241,18 @@ CGRect screenRect;
         [self updateScoreLabel];
     }
     
+    __block CGFloat smallestDistance = CGFLOAT_MAX;
     //this will update each tile node and keep track of the number of tiles
     SKAction *removeFromParent = [SKAction removeFromParent];
     [_tileLayer enumerateChildNodesWithName:@"wall" usingBlock:^(SKNode *node, BOOL *stop)
      {
+         CGFloat tempDistance = [self distance:node.position :_walking.position];
+         if (tempDistance < smallestDistance)
+         {
+             nearestYValue = node.position.y;
+             smallestDistance = tempDistance;
+         }
+         
          [node runAction: _moveToLeft];
             if (node.position.x < 0)
             {
@@ -251,6 +285,8 @@ CGRect screenRect;
 
 - (void)spawnWalls: (BOOL)firstTime
 {
+    if (firstTime)  NSLog(@"Spawning walls for first time");
+    else     NSLog(@"Spawning walls for NOT the first time");
     _tempNumTiles = arc4random_uniform(maxNumTiles-minNumTiles) + minNumTiles;
     
     int randNumY= arc4random_uniform(2) + 1; //3 levels
@@ -331,7 +367,7 @@ CGRect screenRect;
     [self walkingEnemy];
 }
 
--(void)setup
+-(void)setup: (BOOL) firstTime
 {
     _player =[SKSpriteNode spriteNodeWithImageNamed:kPlayer];
    /* _player.position = CGPointMake(_screenWidth/4, _player.size.height/2);
@@ -353,7 +389,9 @@ CGRect screenRect;
     _walkingFrames = walkingText;
     SKTexture *temp = _walkingFrames[0];
     _walking = [SKSpriteNode spriteNodeWithTexture:temp];
-    _walking.position = CGPointMake(screenRect.size.width/3,screenRect.size.height/2);
+    
+    if (firstTime) _walking.position = CGPointMake(screenRect.size.width/3,screenRect.size.height/2);
+    else _walking.position = newDestination;
     
     _walking.physicsBody =[SKPhysicsBody bodyWithRectangleOfSize:_player.size];
     _walking.physicsBody.categoryBitMask = kCategoryPlayerMask;
@@ -361,6 +399,10 @@ CGRect screenRect;
     _walking.physicsBody.dynamic = YES;
     _walking.physicsBody.collisionBitMask = kCategoryEnemyMask;// | kCategoryTileMask;
     _walking.physicsBody.usesPreciseCollisionDetection = YES;
+    _walking.physicsBody.allowsRotation = FALSE;
+    
+    //NSLog(@"Starting to Walk");
+    //jumpDestination = CGPointMake(_walking.position.x, _walking.position.y + 50);
     
     [_tileLayer addChild:_walking];
     [self walkingPlayer];
@@ -368,6 +410,7 @@ CGRect screenRect;
 
 -(void)walkingPlayer
 {
+    isWalking = true;
     [_walking runAction:[SKAction repeatActionForever:
                          [SKAction animateWithTextures:_walkingFrames
                                           timePerFrame:0.1f
@@ -388,19 +431,29 @@ CGRect screenRect;
 
 -(void)jumpingPlayer
 {
+    //NSLog([NSString stringWithFormat:@"_walking.position: %f,%f", _walking.position.x, _walking.position.y]);
+    //NSLog([NSString stringWithFormat:@"Setting JumpDestination to %f,%f\nFrom position %f,%f", jumpDestination.x, jumpDestination.y, _walking.position.x, _walking.position.y]);
+    jumpDestination = CGPointMake(_walking.position.x, _walking.position.y + 80);
     [_walking removeFromParent];
     isWalking =false;
+    
     SKAction *animate =[SKAction animateWithTextures:_jumpingFrames
                                         timePerFrame:0.1f
                                               resize:YES restore:YES];
+    SKAction *move = [SKAction moveToY:jumpDestination.y duration:0.20];
+    
+    SKAction *pause = [SKAction waitForDuration:0.2];
+    
+    SKAction *sink = [SKAction moveToY:nearestYValue + _walking.size.height + 15 duration:0.3];
     SKAction *remove = [SKAction removeFromParent];
     
     
-    [_jumping runAction:[SKAction sequence:@[animate,remove]]];
-    isWalking = true;
+    [_jumping runAction:[SKAction sequence:@[animate,move, pause, sink, remove]]];
+    //isWalking = true;
     //if(isWalking)
     //{
-    [self performSelector:@selector(redoWalking) withObject:self afterDelay:0.4];
+    newDestination = _jumping.position;
+    [self performSelector:@selector(redoWalking) withObject:self afterDelay:1.2];
         
     //}
     return;
@@ -408,7 +461,7 @@ CGRect screenRect;
 
 -(void)redoWalking
 {
-    [self setup];
+    [self setup: FALSE];
     isJumping =0;
 }
 
@@ -438,7 +491,7 @@ CGRect screenRect;
         firstBody = contact.bodyB;
         secondBody = contact.bodyA;
     }
-    NSLog([NSString stringWithFormat:@"isJumping Count: %d", isJumping]);
+    //NSLog([NSString stringWithFormat:@"isJumping Count: %d", isJumping]);
     //if neither of the colliding bodies are tiles
    if (((firstBody.categoryBitMask & kCategoryTileMask) == 0) &&
         ((secondBody.categoryBitMask & kCategoryTileMask) ==0))
@@ -446,25 +499,41 @@ CGRect screenRect;
         //if first body is player and second is Enemy
         if (((firstBody.categoryBitMask & kCategoryPlayerMask) != 0) && ((secondBody.categoryBitMask & kCategoryEnemyMask) !=0))
         {
-            if (isWalking)
+            NSLog(@"First body is player, second is enemy");
+            if (!isWalking)
             {
+                NSLog(@"Player is not walking");
                 [secondBody.node removeFromParent];
+                NSLog(@"Removing secondBody (enemy)");
+                ++playerScore;
+                [self playSound:@"enemyDying.mp3"];
+                [self updateScoreLabel];
                 return;
             }
-            [firstBody.node removeFromParent];
-                
-        }
-        else if (((firstBody.categoryBitMask & kCategoryEnemyMask) != 0) && ((secondBody.categoryBitMask & kCategoryPlayerMask) !=0))
-        {
-            if (isWalking)
-            {
-                [firstBody.node removeFromParent];
-                return;
+            //[firstBody.node removeFromParent];
+            //NSLog(@"aw u dead");
+            else {
+                NSLog(@"player IS walking and should die");
+                [self playSound:@"moan.mp3"];
+                [self goToGameEnd];
             }
-            [secondBody.node removeFromParent];
         }
         else
-            NSLog(@"Somethin's fucked up");
+        {
+            NSLog(@"First body is enemy, second is player");
+            if (isWalking)
+            {
+                NSLog(@"player is walking, you should die");
+                [self playSound:@"moan.mp3"];
+                [self goToGameEnd];
+                return;
+            }
+            NSLog(@"Removing an enemy (first body) since player is not walking");
+            [secondBody.node removeFromParent];
+            ++playerScore;
+            [self playSound:@"enemyDying.mp3"];
+            [self updateScoreLabel];
+        }
     }
     else
     {
@@ -480,6 +549,22 @@ CGRect screenRect;
     _backgroundPlayer.numberOfLoops =-1;
     [_backgroundPlayer prepareToPlay];
     [_backgroundPlayer play];
+}
+-(void)playSound:(NSString *)filename
+{
+    NSError *error;
+    NSURL *backgroundURL =[[NSBundle mainBundle]URLForResource:filename withExtension:nil];
+    _foleySoundPlayer =[[AVAudioPlayer alloc]initWithContentsOfURL:backgroundURL error:&error];
+    _foleySoundPlayer.numberOfLoops =1;
+    [_foleySoundPlayer prepareToPlay];
+    [_foleySoundPlayer play];
+}
+
+-(void) goToGameEnd
+{
+    SKScene *gameEnd = [[GameOverScene alloc] initWithSize:screenRect.size];
+    
+    [self.view presentScene:gameEnd];
 }
 
 @end
