@@ -11,6 +11,8 @@
 #import <CoreMotion/CoreMotion.h>
 #import <AVFoundation/AVFoundation.h>
 
+@import AVFoundation;
+
 /*background Image: http://wall.alphacoders.com/big.php?i=414068 
  http://wallpaperbackgrounds.com/wallpaper/20608
  */
@@ -113,6 +115,8 @@ CGRect screenRect;
     SKLabelNode *_playerScoreLabel;
     bool isWalking;
     int isJumping;
+    
+    AVAudioPlayer *_backgroundPlayer;
 }
 
 -(id)initWithSize:(CGSize)size {    
@@ -160,7 +164,8 @@ CGRect screenRect;
         isWalking = true;
         [self spawnWalls:TRUE];
         [self setup];
-        [self spawnEnemies:1];
+        
+        [self playbgMusic:@"Loop.mp3"];
     }
     return self;
 }
@@ -393,11 +398,11 @@ CGRect screenRect;
     
     [_jumping runAction:[SKAction sequence:@[animate,remove]]];
     isWalking = true;
-    if(isWalking == true)
-    {
-        [self performSelector:@selector(redoWalking) withObject:self afterDelay:0.4];
+    //if(isWalking)
+    //{
+    [self performSelector:@selector(redoWalking) withObject:self afterDelay:0.4];
         
-    }
+    //}
     return;
 }
 
@@ -465,6 +470,16 @@ CGRect screenRect;
     {
         
     }
+}
+
+-(void)playbgMusic:(NSString *)filename
+{
+    NSError *error;
+    NSURL *backgroundURL =[[NSBundle mainBundle]URLForResource:filename withExtension:nil];
+    _backgroundPlayer =[[AVAudioPlayer alloc]initWithContentsOfURL:backgroundURL error:&error];
+    _backgroundPlayer.numberOfLoops =-1;
+    [_backgroundPlayer prepareToPlay];
+    [_backgroundPlayer play];
 }
 
 @end

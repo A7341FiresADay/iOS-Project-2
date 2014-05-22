@@ -31,6 +31,9 @@
 		3F482C4819196655000AE47A /* GameOverScene.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F482C4719196655000AE47A /* GameOverScene.m */; };
 		3FBB4735192D099B000519D2 /* worm.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 3FBB4734192D099B000519D2 /* worm.atlas */; };
 		3FBB4737192D0CB6000519D2 /* Background.png in Resources */ = {isa = PBXBuildFile; fileRef = 3FBB4736192D0CB6000519D2 /* Background.png */; };
+		3FC38462192E2BE600E808C0 /* enemyDying.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 3FC38461192E2BE600E808C0 /* enemyDying.mp3 */; };
+		3FC38464192E2C0C00E808C0 /* Loop.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 3FC38463192E2C0C00E808C0 /* Loop.mp3 */; };
+		3FC38466192E2C2300E808C0 /* moan.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 3FC38465192E2C2300E808C0 /* moan.mp3 */; };
 		3FFE3E1E191ACF99002A47A3 /* background@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3FFE3E1D191ACF99002A47A3 /* background@2x.png */; };
 /* End PBXBuildFile section */
 
@@ -77,6 +80,9 @@
 		3F482C4719196655000AE47A /* GameOverScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameOverScene.m; sourceTree = "<group>"; };
 		3FBB4734192D099B000519D2 /* worm.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = worm.atlas; sourceTree = "<group>"; };
 		3FBB4736192D0CB6000519D2 /* Background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Background.png; sourceTree = "<group>"; };
+		3FC38461192E2BE600E808C0 /* enemyDying.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = enemyDying.mp3; sourceTree = "<group>"; };
+		3FC38463192E2C0C00E808C0 /* Loop.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Loop.mp3; sourceTree = "<group>"; };
+		3FC38465192E2C2300E808C0 /* moan.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = moan.mp3; sourceTree = "<group>"; };
 		3FFE3E1D191ACF99002A47A3 /* background@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "background@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -119,6 +125,9 @@
 		3F482BFB19195FAD000AE47A = {
 			isa = PBXGroup;
 			children = (
+				3FC38465192E2C2300E808C0 /* moan.mp3 */,
+				3FC38463192E2C0C00E808C0 /* Loop.mp3 */,
+				3FC38461192E2BE600E808C0 /* enemyDying.mp3 */,
 				3F2ABDF8192D5D2500CEC9FB /* jumping.atlas */,
 				3FBB4736192D0CB6000519D2 /* Background.png */,
 				3FBB4734192D099B000519D2 /* worm.atlas */,
@@ -279,14 +288,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3FC38464192E2C0C00E808C0 /* Loop.mp3 in Resources */,
 				3F482C1419195FAD000AE47A /* InfoPlist.strings in Resources */,
 				3F482C2719195FAD000AE47A /* Images.xcassets in Resources */,
 				3F482C2519195FAD000AE47A /* Spaceship.png in Resources */,
 				3FBB4735192D099B000519D2 /* worm.atlas in Resources */,
+				3FC38462192E2BE600E808C0 /* enemyDying.mp3 in Resources */,
 				3FFE3E1E191ACF99002A47A3 /* background@2x.png in Resources */,
 				3F482C1D19195FAD000AE47A /* Main.storyboard in Resources */,
 				3F2ABDF9192D5D2500CEC9FB /* jumping.atlas in Resources */,
 				3FBB4737192D0CB6000519D2 /* Background.png in Resources */,
+				3FC38466192E2C2300E808C0 /* moan.mp3 in Resources */,
 				3F456EC0192D02C300D93F11 /* sprite.atlas in Resources */,
 				0772CE05191B050C00F9156D /* wall.png in Resources */,
 			);
