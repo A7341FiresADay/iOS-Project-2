@@ -18,15 +18,15 @@
 {
     self = [super initWithSize:size];
     if (self) {
-        /*SKSpriteNode *bg =
+        SKSpriteNode *bg =
         [SKSpriteNode spriteNodeWithImageNamed:@"background"];
         bg.position =
         CGPointMake(self.size.width/2, self.size.height/2);
-        bg.position =
+        /*bg.position =
         CGPointMake(self.size.width / 2, self.size.height / 2);
         bg.anchorPoint = CGPointMake(0.5, 0.5); // same as default
-        //bg.zRotation = M_PI / 8;
-        [self addChild:bg];*/
+        //bg.zRotation = M_PI / 8;*/
+        [self addChild:bg];
         [self setBackgroundColor:[UIColor grayColor]];
         
         _titleLabel = [SKLabelNode labelNodeWithFontNamed:@"Menlo-Regular"];
