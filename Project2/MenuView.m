@@ -33,7 +33,7 @@
         _playLabel = [SKLabelNode labelNodeWithFontNamed:@"Menlo-Regular"];
         _quitLabel = [SKLabelNode labelNodeWithFontNamed:@"Menlo-Regular"];
         
-        _titleLabel.fontSize = 48;
+        
         _playLabel.fontSize = 44;
         _quitLabel.fontSize = 44;
         
@@ -42,11 +42,11 @@
         _quitLabel.position = CGPointMake(CGRectGetMidX(self.frame), CGRectGetMidY(self.frame) -230);
         //CGPointMake(CGRectGetMidX(self.frame),CGRectGetMidY(self.frame));
         
-        _titleLabel.text = @"What the Platformer?!?!";
-        _playLabel.text = @"Play";
-        _quitLabel.text = @"Quit";
+        //_titleLabel.text = @"What the Platformer?!?!";
+        //_playLabel.text = @"Play";
+        //_quitLabel.text = @"Quit";
         
-        [self addChild:_titleLabel];
+        //[self addChild:_titleLabel];
         [self addChild:_playLabel];
         [self addChild:_quitLabel];
     }
