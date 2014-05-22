@@ -10,6 +10,8 @@
 #import "GameOverScene.h"
 #import <CoreMotion/CoreMotion.h>
 #import <AVFoundation/AVFoundation.h>
+#import "GameOverScene.h"
+#import "MenuView.h"
 
 @import AVFoundation;
 
@@ -93,6 +95,9 @@ double _lastTime;
 double _timeSinceLastSecondWentBy;
 
 CGRect screenRect;
+CGPoint jumpDestination, newDestination;
+CGFloat previousPlayerYValue;
+CGFloat nearestYValue;
 
 @implementation MyScene
 {
@@ -163,11 +168,17 @@ CGRect screenRect;
         
         isWalking = true;
         [self spawnWalls:TRUE];
-        [self setup];
+        [self setup:TRUE];
         
         [self playbgMusic:@"Loop.mp3"];
     }
     return self;
+}
+
+//i'm using this only to compare distance, so no need to square root it.
+- (CGFloat) distance: (CGPoint) a : (CGPoint) b
+{
+    return ((a.x - b.x)*(a.x-b.x) + (a.y -b.y)*(a.y-b.y));
 }
 
 //touch logic
@@ -201,6 +212,14 @@ CGRect screenRect;
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
     // calculate deltaTime
+    
+    if (_walking.position.y < 0)
+    {
+        SKScene *gameEnd = [[GameOverScene alloc] initWithSize:screenRect.size];
+        
+        [self.view presentScene:gameEnd];
+    }
+    
     double time = (double)CFAbsoluteTimeGetCurrent();
     
     float dt = time - _lastTime;
@@ -215,10 +234,18 @@ CGRect screenRect;
         [self updateScoreLabel];
     }
     
+    __block CGFloat smallestDistance = CGFLOAT_MAX;
     //this will update each tile node and keep track of the number of tiles
     SKAction *removeFromParent = [SKAction removeFromParent];
     [_tileLayer enumerateChildNodesWithName:@"wall" usingBlock:^(SKNode *node, BOOL *stop)
      {
+         CGFloat tempDistance = [self distance:node.position :_walking.position];
+         if (tempDistance < smallestDistance)
+         {
+             nearestYValue = node.position.y;
+             smallestDistance = tempDistance;
+         }
+         
          [node runAction: _moveToLeft];
             if (node.position.x < 0)
             {
@@ -331,7 +358,7 @@ CGRect screenRect;
     [self walkingEnemy];
 }
 
--(void)setup
+-(void)setup: (BOOL) firstTime
 {
     _player =[SKSpriteNode spriteNodeWithImageNamed:kPlayer];
    /* _player.position = CGPointMake(_screenWidth/4, _player.size.height/2);
@@ -353,7 +380,9 @@ CGRect screenRect;
     _walkingFrames = walkingText;
     SKTexture *temp = _walkingFrames[0];
     _walking = [SKSpriteNode spriteNodeWithTexture:temp];
-    _walking.position = CGPointMake(screenRect.size.width/3,screenRect.size.height/2);
+    
+    if (firstTime) _walking.position = CGPointMake(screenRect.size.width/3,screenRect.size.height/2);
+    else _walking.position = newDestination;
     
     _walking.physicsBody =[SKPhysicsBody bodyWithRectangleOfSize:_player.size];
     _walking.physicsBody.categoryBitMask = kCategoryPlayerMask;
@@ -361,6 +390,9 @@ CGRect screenRect;
     _walking.physicsBody.dynamic = YES;
     _walking.physicsBody.collisionBitMask = kCategoryEnemyMask;// | kCategoryTileMask;
     _walking.physicsBody.usesPreciseCollisionDetection = YES;
+    
+    //NSLog(@"Starting to Walk");
+    //jumpDestination = CGPointMake(_walking.position.x, _walking.position.y + 50);
     
     [_tileLayer addChild:_walking];
     [self walkingPlayer];
@@ -388,19 +420,29 @@ CGRect screenRect;
 
 -(void)jumpingPlayer
 {
+    //NSLog([NSString stringWithFormat:@"_walking.position: %f,%f", _walking.position.x, _walking.position.y]);
+    //NSLog([NSString stringWithFormat:@"Setting JumpDestination to %f,%f\nFrom position %f,%f", jumpDestination.x, jumpDestination.y, _walking.position.x, _walking.position.y]);
+    jumpDestination = CGPointMake(_walking.position.x, _walking.position.y + 80);
     [_walking removeFromParent];
     isWalking =false;
+    
     SKAction *animate =[SKAction animateWithTextures:_jumpingFrames
                                         timePerFrame:0.1f
                                               resize:YES restore:YES];
+    SKAction *move = [SKAction moveToY:jumpDestination.y duration:0.20];
+    
+    SKAction *pause = [SKAction waitForDuration:0.2];
+    
+    SKAction *sink = [SKAction moveToY:nearestYValue + _walking.size.height + 15 duration:0.3];
     SKAction *remove = [SKAction removeFromParent];
     
     
-    [_jumping runAction:[SKAction sequence:@[animate,remove]]];
+    [_jumping runAction:[SKAction sequence:@[animate,move, pause, sink, remove]]];
     isWalking = true;
     //if(isWalking)
     //{
-    [self performSelector:@selector(redoWalking) withObject:self afterDelay:0.4];
+    newDestination = _jumping.position;
+    [self performSelector:@selector(redoWalking) withObject:self afterDelay:1.2];
         
     //}
     return;
@@ -408,7 +450,7 @@ CGRect screenRect;
 
 -(void)redoWalking
 {
-    [self setup];
+    [self setup: FALSE];
     isJumping =0;
 }
 
@@ -438,7 +480,7 @@ CGRect screenRect;
         firstBody = contact.bodyB;
         secondBody = contact.bodyA;
     }
-    NSLog([NSString stringWithFormat:@"isJumping Count: %d", isJumping]);
+    //NSLog([NSString stringWithFormat:@"isJumping Count: %d", isJumping]);
     //if neither of the colliding bodies are tiles
    if (((firstBody.categoryBitMask & kCategoryTileMask) == 0) &&
         ((secondBody.categoryBitMask & kCategoryTileMask) ==0))
