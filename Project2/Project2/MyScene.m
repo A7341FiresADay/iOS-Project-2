@@ -8,6 +8,7 @@
 
 #import "MyScene.h"
 #import "GameOverScene.h"
+#import <CoreMotion/CoreMotion.h>
 #import <AVFoundation/AVFoundation.h>
 
 /*background Image: http://wall.alphacoders.com/big.php?i=414068 
@@ -69,9 +70,13 @@ NSString *const kPlayer = @"harry1.png";
 NSString *const kEnemy = @"worm1.png";
 
 
-static uint32_t const kCategoryPlayer = 1;
+/*static uint32_t const kCategoryPlayer = 1;
 static uint32_t const kCategoryWorm = 2;
-static uint32_t const kCategoryTile = 4;
+static uint32_t const kCategoryTile = 4;*/
+
+static uint32_t const kCategoryPlayerMask = 0x1 << 0;
+static uint32_t const kCategoryEnemyMask = 0x1 << 1;
+static uint32_t const kCategoryTileMask = 0x1 << 2;
 
 
 static const float BG_POINTS=100;
@@ -134,6 +139,9 @@ CGRect screenRect;
         _playerScoreLabel.text = @"Score: 0";
         [self addChild:_playerScoreLabel];
         
+        //zero gravity
+        //self.physicsWorld.gravity = CGVectorMake(0, 0);
+        self.physicsWorld.contactDelegate = self;
         //self.backgroundColor = [SKColor colorWithRed:0.15 green:0.15 blue:0.3 alpha:1.0];
         
         _moveToLeft = [SKAction moveByX:-4 y:0 duration:0.1];
@@ -159,28 +167,30 @@ CGRect screenRect;
 
 //touch logic
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    NSMutableArray *jumpingArray =[NSMutableArray array];
+    ++isJumping;
     
-    SKTextureAtlas *jumpingAtles =[SKTextureAtlas atlasNamed:@"jumping"];
-    
-    int image = jumpingAtles.textureNames.count;
-    for(int i=1; i<= image;i++)
+    if (isJumping <=1)
     {
-        NSString *textureName =[NSString stringWithFormat:@"jump%d",i];
-        SKTexture *temp = [jumpingAtles textureNamed:textureName];
-        [jumpingArray addObject:temp];
+        NSMutableArray *jumpingArray =[NSMutableArray array];
+    
+        SKTextureAtlas *jumpingAtles =[SKTextureAtlas atlasNamed:@"jumping"];
+    
+        int image = jumpingAtles.textureNames.count;
+        for(int i=1; i<= image;i++)
+        {
+            NSString *textureName =[NSString stringWithFormat:@"jump%d",i];
+            SKTexture *temp = [jumpingAtles textureNamed:textureName];
+            [jumpingArray addObject:temp];
+        }
+        _jumpingFrames = jumpingArray;
+        SKTexture *temp = _walkingFrames[0];
+        _jumping = [SKSpriteNode spriteNodeWithTexture:temp];
+        _jumping.position = CGPointMake(_walking.position.x, _walking.position.y);
+        isWalking = false;
+    
+        [_tileLayer addChild:_jumping];
+        [self jumpingPlayer];
     }
-    _jumpingFrames = jumpingArray;
-    SKTexture *temp = _walkingFrames[0];
-    _jumping = [SKSpriteNode spriteNodeWithTexture:temp];
-    _jumping.position = CGPointMake(_walking.position.x, _walking.position.y);
-    //_walking.position = CGPointMake(100, 100);
-    
-    isWalking = false;
-    
-    [self addChild:_jumping];
-    [self jumpingPlayer];
-    [self runAction:[SKAction sequence:@[]]];   //might remove- corey doesn't have- will see what happens
 }
 
 -(void)update:(CFTimeInterval)currentTime {
@@ -250,13 +260,18 @@ CGRect screenRect;
         wall.name = @"wall";
         wall.xScale = 2;
         wall.yScale = 1;
-        xPosition = firstTime ? (i * wall.size.width) + _screenWidth - 100 : ((i * wall.size.width) + _screenWidth) + (wall.size.width * 2);
+        xPosition = firstTime ? (i * wall.size.width) : ((i * wall.size.width) + _screenWidth) + (wall.size.width * 2);
         wall.position = CGPointMake(xPosition, yPosition);
+        
         wall.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:wall.size];
         wall.physicsBody.usesPreciseCollisionDetection = YES;
-        [_tileLayer addChild:wall];
-        wall.physicsBody.affectedByGravity = NO;
         wall.physicsBody.dynamic = NO;
+        wall.physicsBody.affectedByGravity = NO;
+    
+        //wall.physicsBody.categoryBitMask = kCategoryTileMask;
+        //wall.physicsBody.contactTestBitMask = kCategoryPlayerMask;
+        
+        [_tileLayer addChild:wall];
         ++onScreenTiles;
     }
     tileWidth = wall.size.width;
@@ -276,7 +291,6 @@ CGRect screenRect;
 
 -(void)makeEnemy: (CGPoint) location
 {
-    NSLog([NSString stringWithFormat:@"Location of enemy: %f,%f", location.x, location.y]);
     _enemy =[SKSpriteNode spriteNodeWithImageNamed:kEnemy];
     _enemy.position = location;
     _enemy.name = @"enemy";
@@ -301,6 +315,11 @@ CGRect screenRect;
     [_wiggling runAction:[SKAction repeatActionForever:moveLeft]];
     
     _wiggling.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:_enemy.size];
+
+    _wiggling.physicsBody.dynamic = YES;
+    _wiggling.physicsBody.categoryBitMask = kCategoryEnemyMask;
+    _wiggling.physicsBody.contactTestBitMask = kCategoryPlayerMask;
+    //_wiggling.physicsBody.collisionBitMask = 0;
     _wiggling.physicsBody.usesPreciseCollisionDetection = YES;
     
     [_tileLayer addChild:_wiggling];
@@ -309,8 +328,8 @@ CGRect screenRect;
 
 -(void)setup
 {
-    /*_player =[SKSpriteNode spriteNodeWithImageNamed:kPlayer];
-    _player.position = CGPointMake(_screenWidth/4, _player.size.height/2);
+    _player =[SKSpriteNode spriteNodeWithImageNamed:kPlayer];
+   /* _player.position = CGPointMake(_screenWidth/4, _player.size.height/2);
     _player.zPosition =2;*/ //might need to add back in
     
     //[self addChild:_player];
@@ -332,13 +351,13 @@ CGRect screenRect;
     _walking.position = CGPointMake(screenRect.size.width/3,screenRect.size.height/2);
     
     _walking.physicsBody =[SKPhysicsBody bodyWithRectangleOfSize:_player.size];
+    _walking.physicsBody.categoryBitMask = kCategoryPlayerMask;
+    _walking.physicsBody.contactTestBitMask = kCategoryEnemyMask;// | kCategoryTileMask;
     _walking.physicsBody.dynamic = YES;
-    _walking.physicsBody.categoryBitMask = kCategoryPlayer;
-    _walking.physicsBody.contactTestBitMask = kCategoryTile;
-    _walking.physicsBody.collisionBitMask = 0;
-    //_walking.position = CGPointMake(100, 100);
+    _walking.physicsBody.collisionBitMask = kCategoryEnemyMask;// | kCategoryTileMask;
+    _walking.physicsBody.usesPreciseCollisionDetection = YES;
     
-    [self addChild:_walking];
+    [_tileLayer addChild:_walking];
     [self walkingPlayer];
 }
 
@@ -399,6 +418,53 @@ CGRect screenRect;
 {
     if (playerScore < 0) playerScore = 0;
     _playerScoreLabel.text = [NSString stringWithFormat:@"Score: %d", playerScore];
+}
+
+-(void) didBeginContact:(SKPhysicsContact *)contact
+{
+    SKPhysicsBody *firstBody;
+    SKPhysicsBody *secondBody;
+    
+    if(contact.bodyA.categoryBitMask & kCategoryPlayerMask && contact.bodyA.categoryBitMask & kCategoryEnemyMask){
+        firstBody = contact.bodyA;
+        secondBody = contact.bodyB;
+    }
+    else{
+        firstBody = contact.bodyB;
+        secondBody = contact.bodyA;
+    }
+    NSLog([NSString stringWithFormat:@"isJumping Count: %d", isJumping]);
+    //if neither of the colliding bodies are tiles
+   if (((firstBody.categoryBitMask & kCategoryTileMask) == 0) &&
+        ((secondBody.categoryBitMask & kCategoryTileMask) ==0))
+    {
+        //if first body is player and second is Enemy
+        if (((firstBody.categoryBitMask & kCategoryPlayerMask) != 0) && ((secondBody.categoryBitMask & kCategoryEnemyMask) !=0))
+        {
+            if (isWalking)
+            {
+                [secondBody.node removeFromParent];
+                return;
+            }
+            [firstBody.node removeFromParent];
+                
+        }
+        else if (((firstBody.categoryBitMask & kCategoryEnemyMask) != 0) && ((secondBody.categoryBitMask & kCategoryPlayerMask) !=0))
+        {
+            if (isWalking)
+            {
+                [firstBody.node removeFromParent];
+                return;
+            }
+            [secondBody.node removeFromParent];
+        }
+        else
+            NSLog(@"Somethin's fucked up");
+    }
+    else
+    {
+        
+    }
 }
 
 @end
