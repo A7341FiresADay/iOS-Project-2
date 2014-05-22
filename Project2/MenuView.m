@@ -19,7 +19,7 @@
     self = [super initWithSize:size];
     if (self) {
         SKSpriteNode *bg =
-        [SKSpriteNode spriteNodeWithImageNamed:@"background"];
+        [SKSpriteNode spriteNodeWithImageNamed:@"intro"];
         bg.position =
         CGPointMake(self.size.width/2, self.size.height/2);
         /*bg.position =
