@@ -68,6 +68,12 @@ static inline CGFloat ScalarRandomRange(CGFloat min,
 NSString *const kPlayer = @"harry1.png";
 NSString *const kEnemy = @"worm1.png";
 
+
+static uint32_t const kCategoryPlayer = 1;
+static uint32_t const kCategoryWorm = 2;
+static uint32_t const kCategoryTile = 4;
+
+
 static const float BG_POINTS=100;
 
 int tileWidth, _tempNumTiles, onScreenTiles = 0;
@@ -100,6 +106,8 @@ CGRect screenRect;
     SKSpriteNode *_wiggling;
     NSArray *_wigglingFrames;
     SKLabelNode *_playerScoreLabel;
+    bool isWalking;
+    int isJumping;
 }
 
 -(id)initWithSize:(CGSize)size {    
@@ -141,6 +149,7 @@ CGRect screenRect;
             //look at chapter 5 page 136-141 for help about layers and correct positions of stuff
         }
         
+        isWalking = true;
         [self spawnWalls:TRUE];
         [self setup];
         [self spawnEnemies:1];
@@ -164,11 +173,14 @@ CGRect screenRect;
     _jumpingFrames = jumpingArray;
     SKTexture *temp = _walkingFrames[0];
     _jumping = [SKSpriteNode spriteNodeWithTexture:temp];
-    _jumping.position = CGPointMake(100,500);
+    _jumping.position = CGPointMake(_walking.position.x, _walking.position.y);
     //_walking.position = CGPointMake(100, 100);
     
+    isWalking = false;
+    
     [self addChild:_jumping];
-    [self runAction:[SKAction sequence:@[]]];
+    [self jumpingPlayer];
+    [self runAction:[SKAction sequence:@[]]];   //might remove- corey doesn't have- will see what happens
 }
 
 -(void)update:(CFTimeInterval)currentTime {
@@ -297,9 +309,9 @@ CGRect screenRect;
 
 -(void)setup
 {
-    _player =[SKSpriteNode spriteNodeWithImageNamed:kPlayer];
+    /*_player =[SKSpriteNode spriteNodeWithImageNamed:kPlayer];
     _player.position = CGPointMake(_screenWidth/4, _player.size.height/2);
-    _player.zPosition =2;
+    _player.zPosition =2;*/ //might need to add back in
     
     //[self addChild:_player];
     
@@ -317,7 +329,13 @@ CGRect screenRect;
     _walkingFrames = walkingText;
     SKTexture *temp = _walkingFrames[0];
     _walking = [SKSpriteNode spriteNodeWithTexture:temp];
-    _walking.position = CGPointMake(screenRect.size.width/2,screenRect.size.height/2);
+    _walking.position = CGPointMake(screenRect.size.width/3,screenRect.size.height/2);
+    
+    _walking.physicsBody =[SKPhysicsBody bodyWithRectangleOfSize:_player.size];
+    _walking.physicsBody.dynamic = YES;
+    _walking.physicsBody.categoryBitMask = kCategoryPlayer;
+    _walking.physicsBody.contactTestBitMask = kCategoryTile;
+    _walking.physicsBody.collisionBitMask = 0;
     //_walking.position = CGPointMake(100, 100);
     
     [self addChild:_walking];
@@ -346,8 +364,28 @@ CGRect screenRect;
 
 -(void)jumpingPlayer
 {
-    [_jumping runAction:[SKAction animateWithTextures:_jumpingFrames timePerFrame:0.1f]];
+    [_walking removeFromParent];
+    isWalking =false;
+    SKAction *animate =[SKAction animateWithTextures:_jumpingFrames
+                                        timePerFrame:0.1f
+                                              resize:YES restore:YES];
+    SKAction *remove = [SKAction removeFromParent];
+    
+    
+    [_jumping runAction:[SKAction sequence:@[animate,remove]]];
+    isWalking = true;
+    if(isWalking == true)
+    {
+        [self performSelector:@selector(redoWalking) withObject:self afterDelay:0.4];
+        
+    }
     return;
+}
+
+-(void)redoWalking
+{
+    [self setup];
+    isJumping =0;
 }
 
 
